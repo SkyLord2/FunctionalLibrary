@@ -2,17 +2,20 @@ package org.example;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class FunctionalTest {
     @Test
     public void ifElse() {
-        Function fn1 = value -> {
+        Function<String, String> fn1 = value -> {
             System.out.println("fn1 print value: " + value);
             return value;
         };
 
-        Function fn2 = value -> {
+        Function<String, String> fn2 = value -> {
             System.out.println("fn2 print value: " + value);
             return value;
         };
@@ -21,71 +24,67 @@ public class FunctionalTest {
 
     @Test
     public void testIfElse() {
-        Function fn1 = value -> {
+        Function<String, String> fn1 = value -> {
             System.out.println("cd1 is matched: " + value);
             return value;
         };
 
-        Function fn2 = value -> {
+        Function<String, String> fn2 = value -> {
             System.out.println("cd2 is matched: " + value);
             return value;
         };
 
-        Function cd = value -> {
-            return ((String)value).startsWith("h");
-        };
+        Predicate<String> cd = value -> value.startsWith("h");
         Functional.ifElse(cd, fn1, fn2).apply("hello world");
     }
 
     @Test
     public void pipe() {
-        Function fn1 = value -> {
+        Function<String, String> fn1 = value -> {
             System.out.println("fn1 print value: " + value);
             value = "fuck world";
             return value;
         };
 
-        Function fn2 = value -> {
+        Function<String, String> fn2 = value -> {
             System.out.println("fn2 print value: " + value);
             return value;
         };
 
-        Functional.pipe(fn1, fn2).apply("hello world");
+        Functional.<String, String>pipe(fn1, fn2).apply("hello world");
     }
 
     @Test
     public void cond() {
-        Function fn1 = value -> {
+        Function<String, String> fn1 = value -> {
             System.out.println("cd1 is matched: " + value);
             return value;
         };
 
-        Function fn2 = value -> {
+        Function<String, String> fn2 = value -> {
             System.out.println("cd2 is matched: " + value);
             return value;
         };
 
-        Function cd1 = value -> {
-            return ((String)value).startsWith("h");
-        };
+        Predicate<String> cd1 = value -> value.startsWith("h");
 
-        Function cd2 = value -> {
-            return ((String)value).startsWith("f");
-        };
+        Predicate<String> cd2 = value -> value.startsWith("f");
 
-        Function[] pair1 = {cd1, fn1};
-        Function[] pair2 = {cd2, fn2};
-        Functional.cond(pair1, pair2).apply("fuck world");
+        List<CondWrap<String, String>> pairs = new ArrayList<>();
+        pairs.add(CondWrap.<String, String>builder().predicate(cd1).operation(fn1).build());
+        pairs.add(CondWrap.<String, String>builder().predicate(cd2).operation(fn2).build());
+
+        Functional.cond(pairs).apply("fuck world");
     }
 
     @Test
     public void series() {
-        Function fn1 = value -> {
+        Function<String, String> fn1 = value -> {
             System.out.println("fn1 print value: " + value);
             return value;
         };
 
-        Function fn2 = value -> {
+        Function<String, String> fn2 = value -> {
             System.out.println("fn2 print value: " + value);
             return value;
         };
@@ -94,7 +93,7 @@ public class FunctionalTest {
 
     @Test
     public void then() {
-        Function fn1 = value -> {
+        Function<String, String> fn1 = value -> {
             System.out.println("fn1 print value: " + value);
             return value;
         };
@@ -106,14 +105,12 @@ public class FunctionalTest {
 
     @Test
     public void testThen() {
-        Function fn1 = value -> {
+        Function<String, String> fn1 = value -> {
             System.out.println("cd1 is matched: " + value);
             return value;
         };
 
-        Function cd1 = value -> {
-            return ((String)value).startsWith("f");
-        };
+        Predicate<String> cd1 = value -> value.startsWith("f");
         Functional.then(cd1, fn1).apply("hello world");
     }
 }
